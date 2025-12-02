@@ -1,9 +1,10 @@
 use std::convert::TryFrom;
+use std::ops::Rem;
 use std::str::FromStr;
 pub struct Dial {
     position: i32,
     pub point_password: u64,
-    click_password: u64,
+    pub click_password: u64,
 }
 
 impl Dial {
@@ -20,6 +21,7 @@ impl Dial {
             Direction::Left => -(rotation.distance as i32),
             Direction::Right => rotation.distance as i32,
         };
+        self.click_password += get_clicks(self.position, self.position + delta);
         self.position = (self.position + delta).rem_euclid(100);
         if self.position == 0 {
             self.point_password += 1;
@@ -27,6 +29,15 @@ impl Dial {
     }
 }
 
+fn get_clicks(start: i32, end: i32) -> u64 {
+    (match (start, end) {
+        (0, -99..=99) => 0,
+        (0, ..=-100) => end.abs().div_euclid(100),
+        (0, 100..) => end.div_euclid(100),
+        (_, ..=0) => end.abs().div_euclid(100) + 1,
+        (_, _) => end.div_euclid(100),
+    }) as u64
+}
 enum Direction {
     Left,
     Right,
