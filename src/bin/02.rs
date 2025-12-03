@@ -1,21 +1,26 @@
+use std::str::FromStr;
+
 advent_of_code::solution!(2);
+
+pub fn digits_repeat_twice(id: u64) -> bool {
+    let digits = id.to_string();
+    if !digits.len().is_multiple_of(2) {
+        return false;
+    }
+    let (a, b) = digits.split_at(digits.len() / 2);
+    a == b
+}
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut result: u64 = 0;
     for id_range in input.split(',') {
         let (start, end) = id_range.split_once('-').unwrap();
         let (start, end): (u64, u64) = (start.parse().unwrap(), end.parse().unwrap());
-        for id in start..=end {
-            let id_as_string = id.to_string();
-            if id_as_string.len().is_multiple_of(2) {
-                let middle = id_as_string.len() / 2;
-                if &id_as_string[0..middle] == &id_as_string[middle..id_as_string.len()] {
-                    result += id;
-                }
-            }
-        }
-    }
 
+        result += (start..=end)
+            .filter(|&id| digits_repeat_twice(id))
+            .sum::<u64>();
+    }
     Some(result)
 }
 
