@@ -3,8 +3,8 @@ use std::ops::Deref;
 advent_of_code::solution!(3);
 
 fn parse_digits(s: &str) -> Vec<u8>{
-    s.chars()
-        .map(|char| char.to_digit(10).unwrap() as u8)
+    s.bytes()
+        .map(|b| b - b'0')
         .collect()
 }
 
@@ -25,14 +25,14 @@ fn get_joltage(batteries: Vec<u8>, count: usize) -> u64 {
     let (_, joltage) =
         (0..count)
             .rev()
-            .fold((batteries, 0), |(batteries, joltage), n| {
-                let (pos, battery) = find_largest(n, batteries.clone());
-                (batteries[pos + 1..].to_owned(), joltage + battery as u64 * 10_u64.pow(n as u32))
+            .fold((batteries.as_slice(), 0), |(batteries, joltage), n| {
+                let (pos, battery) = find_largest(n, batteries);
+                (&batteries[pos + 1..], joltage + battery as u64 * 10_u64.pow(n as u32))
             });
     joltage
 }
 
-fn find_largest(n: usize, batteries: Vec<u8>) -> (usize, u8) {
+fn find_largest(n: usize, batteries: &[u8]) -> (usize, u8) {
     let (battery_pos, battery) = batteries
         .into_iter()
         .enumerate()
@@ -40,7 +40,7 @@ fn find_largest(n: usize, batteries: Vec<u8>) -> (usize, u8) {
         .skip(n)
         .max_by_key(|&(_i, x)| x)
         .unwrap();
-    (battery_pos, battery)
+    (battery_pos, *battery)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
