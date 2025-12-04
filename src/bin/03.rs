@@ -1,11 +1,26 @@
-use std::ops::Deref;
-
 advent_of_code::solution!(3);
+fn find_largest(batteries: &[u8], n: usize) -> (usize, u8) {
+    let (position, &value) = batteries
+        .iter()
+        .enumerate()
+        .rev()
+        .skip(n)
+        .max_by_key(|&(_i, x)| x)
+        .unwrap();
+    (position, value)
+}
 
-fn parse_digits(s: &str) -> Vec<u8>{
-    s.bytes()
-        .map(|b| b - b'0')
-        .collect()
+fn parse_digits(s: &str) -> Vec<u8> {
+    s.bytes().map(|b| b - b'0').collect()
+}
+
+fn compute_joltage(batteries: &[u8], count: usize) -> u64 {
+    let mut remaining = batteries;
+    (0..count).rev().fold(0, |joltage, n| {
+        let (pos, battery) = find_largest(remaining, n);
+        remaining = &remaining[pos + 1..];
+        joltage + battery as u64 * 10_u64.pow(n as u32)
+    })
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -14,33 +29,10 @@ pub fn part_one(input: &str) -> Option<u64> {
             .lines()
             .map(|batteries| {
                 let batteries: Vec<u8> = parse_digits(batteries);
-
-                get_joltage(batteries, 2)
+                compute_joltage(&batteries, 2)
             })
             .sum::<u64>(),
     )
-}
-
-fn get_joltage(batteries: Vec<u8>, count: usize) -> u64 {
-    let (_, joltage) =
-        (0..count)
-            .rev()
-            .fold((batteries.as_slice(), 0), |(batteries, joltage), n| {
-                let (pos, battery) = find_largest(n, batteries);
-                (&batteries[pos + 1..], joltage + battery as u64 * 10_u64.pow(n as u32))
-            });
-    joltage
-}
-
-fn find_largest(n: usize, batteries: &[u8]) -> (usize, u8) {
-    let (battery_pos, battery) = batteries
-        .into_iter()
-        .enumerate()
-        .rev()
-        .skip(n)
-        .max_by_key(|&(_i, x)| x)
-        .unwrap();
-    (battery_pos, *battery)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
@@ -49,7 +41,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             .lines()
             .map(|batteries| {
                 let batteries: Vec<u8> = parse_digits(batteries);
-                get_joltage(batteries, 12)
+                compute_joltage(&batteries, 12)
             })
             .sum::<u64>(),
     )
