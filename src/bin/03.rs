@@ -28,8 +28,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         input
             .lines()
             .map(|batteries| {
-                let batteries: Vec<u8> = parse_digits(batteries);
-                compute_joltage(&batteries, 2)
+                compute_joltage(&parse_digits(batteries), 2)
             })
             .sum::<u64>(),
     )
@@ -40,8 +39,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         input
             .lines()
             .map(|batteries| {
-                let batteries: Vec<u8> = parse_digits(batteries);
-                compute_joltage(&batteries, 12)
+                compute_joltage(&parse_digits(batteries), 12)
             })
             .sum::<u64>(),
     )
