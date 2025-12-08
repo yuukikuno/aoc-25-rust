@@ -1,43 +1,4 @@
-use std::ops::{Index, IndexMut};
-
 advent_of_code::solution!(6);
-
-struct Grid {
-    width: usize,
-    height: usize,
-    cells: Vec<char>,
-}
-
-impl Index<(usize, usize)> for Grid {
-    type Output = char;
-
-    fn index(&self, (x, y): (usize, usize)) -> &Self::Output {
-        &self.cells[x + y * self.width]
-    }
-}
-
-impl IndexMut<(usize, usize)> for Grid {
-    fn index_mut(
-        &mut self,
-        (x, y): (usize, usize),
-    ) -> &mut <Self as Index<(usize, usize)>>::Output {
-        &mut self.cells[x + y * self.width]
-    }
-}
-
-impl Grid {
-    pub fn new(contents: Vec<&str>) -> Self {
-        Grid {
-            width: contents.first().unwrap().len(),
-            height: contents.len(),
-            cells: contents.iter().flat_map(|line| line.chars()).collect(),
-        }
-    }
-
-    // pub fn iter(&self) -> impl Iterator<Item = (usize, usize, &Cell)> {
-    //     (0..self.height).flat_map(move |y| (0..self.width).map(move |x| (x, y, &self[(x, y)])))
-    // }
-}
 
 pub fn part_one(input: &str) -> Option<u64> {
     let lines: Vec<Vec<&str>> = input
@@ -79,7 +40,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         .collect();
 
     let mut numbers: Vec<Vec<char>> = vec![];
-    for (y, line) in lines.clone().take(lines.count() - 1).enumerate() {
+    for (line) in lines.clone().take(lines.count() - 1) {
         for (x, char) in line.chars().enumerate() {
             if numbers.len() <= x {
                 numbers.push(vec![char]);
