@@ -40,23 +40,30 @@ pub fn part_one(input: &str) -> Option<u64> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut lines = input.lines().map(|line| line.as_bytes()).step_by(2);
-    let mut first = lines.next()?.iter();
-    let width = first.len();
-    let starting_pos = first.position(|&char| char == b'S').expect("missing start");
+    let first_line = lines.next()?;
+    let width = first_line.len();
+    let starting_pos = first_line
+        .iter()
+        .position(|&char| char == b'S')
+        .expect("missing start");
+
     let mut map: Vec<u64> = vec![0; width];
     map[starting_pos] += 1;
-    let mut next_map = vec![0; width];
 
     let mut result = 1;
-
+    let mut next_map = vec![0; width];
     for line in lines {
         next_map.fill(0);
 
-        for (x, &count) in map.iter().enumerate().filter(|&(_x, &count)| count > 0){
+        for x in 0..width{
+            let count = map[x];
+            if count == 0{
+                continue
+            }
             if line[x] == b'^' {
                 result += count;
-                next_map[x+1] += count;
-                next_map[x-1] += count;
+                next_map[x + 1] += count;
+                next_map[x - 1] += count;
             } else {
                 next_map[x] += count
             }
