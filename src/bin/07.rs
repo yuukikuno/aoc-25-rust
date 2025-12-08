@@ -5,13 +5,9 @@ advent_of_code::solution!(7);
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut lines = input.lines().map(|line| line.as_bytes()).step_by(2);
-    let mut first = lines
-        .next()?
-        .iter();
+    let mut first = lines.next()?.iter();
     let width = first.len();
-    let starting_pos = first
-        .position(|&char| char == b'S')
-        .expect("missing start");
+    let starting_pos = first.position(|&char| char == b'S').expect("missing start");
     let mut beams_pos: Vec<usize> = vec![starting_pos];
     let mut next_beams_pos = Vec::new();
 
@@ -43,7 +39,32 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut lines = input.lines().map(|line| line.as_bytes()).step_by(2);
+    let mut first = lines.next()?.iter();
+    let width = first.len();
+    let starting_pos = first.position(|&char| char == b'S').expect("missing start");
+    let mut map: Vec<u64> = vec![0; width];
+    map[starting_pos] += 1;
+    let mut next_map = vec![0; width];
+
+    let mut result = 1;
+
+    for line in lines {
+        next_map.fill(0);
+
+        for (x, &count) in map.iter().enumerate().filter(|&(_x, &count)| count > 0){
+            if line[x] == b'^' {
+                result += count;
+                next_map[x+1] += count;
+                next_map[x-1] += count;
+            } else {
+                next_map[x] += count
+            }
+        }
+
+        std::mem::swap(&mut map, &mut next_map);
+    }
+    Some(result)
 }
 
 #[cfg(test)]
@@ -59,6 +80,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(40));
     }
 }
