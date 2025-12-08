@@ -3,18 +3,18 @@ use std::collections::HashSet;
 advent_of_code::solution!(8);
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let boxes: Vec<(f32, f32, f32)> = input
+    let boxes: Vec<(u64, u64, u64)> = input
         .lines()
         .map(|line| {
             let mut line = line.split(",");
             (
-                line.next().unwrap().parse::<f32>().unwrap(),
-                line.next().unwrap().parse::<f32>().unwrap(),
-                line.next().unwrap().parse::<f32>().unwrap(),
+                line.next().unwrap().parse::<u64>().unwrap(),
+                line.next().unwrap().parse::<u64>().unwrap(),
+                line.next().unwrap().parse::<u64>().unwrap(),
             )
         })
         .collect();
-    let mut distances: Vec<(usize, usize, f32)> = boxes
+    let mut distances: Vec<(usize, usize, u64)> = boxes
         .iter()
         .enumerate()
         .flat_map(|(a, (xa, ya, za))| {
@@ -23,17 +23,13 @@ pub fn part_one(input: &str) -> Option<u64> {
                 .enumerate()
                 .skip(a + 1)
                 .map(move |(b, (xb, yb, zb))| {
-                    (
-                        a,
-                        b,
-                        ((xa - xb).powf(2f32) + (ya - yb).powf(2f32) + (za - zb).powf(2f32)).sqrt(),
-                    )
+                    (a, b, (xa - xb).pow(2) + (ya - yb).pow(2) + (za - zb).pow(2))
                 })
         })
         .collect();
     distances.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
 
-    let connections: Vec<(usize, usize, f32)> = distances.iter().take(1000).copied().collect();
+    let connections: Vec<(usize, usize, u64)> = distances.iter().take(1000).copied().collect();
     let mut circuits: Vec<Vec<usize>> = vec![];
 
     for (a, b, _) in connections {
@@ -63,7 +59,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         }
     }
 
-    for circuit in circuits.iter_mut(){
+    for circuit in circuits.iter_mut() {
         circuit.sort();
         circuit.dedup();
     }
@@ -77,7 +73,46 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let boxes: Vec<(u64, u64, u64)> = input
+        .lines()
+        .map(|line| {
+            let mut line = line.split(",");
+            (
+                line.next().unwrap().parse::<u64>().unwrap(),
+                line.next().unwrap().parse::<u64>().unwrap(),
+                line.next().unwrap().parse::<u64>().unwrap(),
+            )
+        })
+        .collect();
+    let mut distances: Vec<(usize, usize, u64)> = boxes
+        .iter()
+        .enumerate()
+        .flat_map(|(a, (xa, ya, za))| {
+            boxes
+                .iter()
+                .enumerate()
+                .skip(a + 1)
+                .map(move |(b, (xb, yb, zb))| {
+                    (a, b, (xa - xb).pow(2) + (ya - yb).pow(2) + (za - zb).pow(2))
+                })
+        })
+        .collect();
+    distances.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
+
+    let mut connections = distances.iter();
+    let box_count = boxes.len();
+    let mut connected: HashSet<usize> = HashSet::new();
+    loop {
+        let connection = connections.next().unwrap();
+        let a = connection.0;
+        let b = connection.1;
+        connected.insert(a);
+        connected.insert(b);
+
+        if connected.len() == box_count {
+            return Some(boxes[a].0 * boxes[b].0);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -93,6 +128,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(25272));
     }
 }
