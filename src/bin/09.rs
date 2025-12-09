@@ -84,60 +84,23 @@ pub fn part_two(input: &str) -> Option<u64> {
 
     areas.sort_by_key(|&(_, _, size)| u64::MAX - size);
 
-    //check areas until we find one that only has green tiles in it?
-    'areas: for (n, &(a, b, area)) in areas.iter().enumerate() {
-        //iterate over all tiles and check
+    for (a, b, area) in areas {
         let x_min = red_tiles[a].0.min(red_tiles[b].0);
         let x_max = red_tiles[a].0.max(red_tiles[b].0);
         let y_min = red_tiles[a].1.min(red_tiles[b].1);
         let y_max = red_tiles[a].1.max(red_tiles[b].1);
-        // if any red_tiles not on border we skip
         if red_tiles
             .iter()
             .any(|&(x, y)| x > x_min && x < x_max && y > y_min && y < y_max)
         {
-            continue 'areas;
+            continue
         }
         if green_tiles
             .iter()
             .any(|&(x, y)| x > x_min && x < x_max && y > y_min && y < y_max)
         {
-            continue 'areas;
+            continue
         }
-        // for x in [x_min,x_max, x_min+x_max/2] {
-        //     for y in [y_min,y_max, y_min+y_max/2] {
-        //         if !horizontal.contains(&(x, y)) && !vertical.contains(&(x, y)) {
-        //             let right_count = vertical
-        //                 .iter()
-        //                 .filter(|(xb, yb)| xb > &x && yb == &y)
-        //                 .count();
-        //             // println!("checking {x},{y} {right_count}");
-        //             if right_count.is_multiple_of(2){
-        //                 // println!("skip(left/right eager)");
-        //                 continue 'areas;
-        //             }
-        //         } else {
-        //             // println!("skip(ok)");
-        //         }
-        //     }
-        // }
-        // for x in x_min..=x_max {
-        //     for y in y_min..=y_max {
-        //         if !horizontal.contains(&(x, y)) && !vertical.contains(&(x, y)) {
-        //             let right_count = vertical
-        //                 .iter()
-        //                 .filter(|(xb, yb)| xb > &x && yb == &y)
-        //                 .count();
-        //             // println!("checking {x},{y} {right_count}");
-        //             if right_count.is_multiple_of(2){
-        //                 // println!("skip(left/right)");
-        //                 continue 'areas;
-        //             }
-        //         } else {
-        //             // println!("skip(ok)");
-        //         }
-        //     }
-        // }
         return Some(area);
     }
 

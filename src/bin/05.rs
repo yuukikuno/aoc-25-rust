@@ -1,4 +1,3 @@
-use std::ops::RangeInclusive;
 
 advent_of_code::solution!(5);
 

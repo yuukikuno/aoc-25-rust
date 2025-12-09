@@ -40,7 +40,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         .collect();
 
     let mut numbers: Vec<Vec<char>> = vec![];
-    for (line) in lines.clone().take(lines.count() - 1) {
+    for line in lines.clone().take(lines.count() - 1) {
         for (x, char) in line.chars().enumerate() {
             if numbers.len() <= x {
                 numbers.push(vec![char]);
